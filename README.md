@@ -1,41 +1,36 @@
-# gotoartifact-challenge
+# LI.FI Challenge
 
-Implementation of an ERC721 contract that limits the amount of tokens each address can mint.
-See [Challenge Specification](https://docs.google.com/document/d/1rofuSjB9Z00DDyMOycPz-twY0RFT687kFnZN4Ai_RXo/edit#heading=h.g79izkef2lyx)
+Generic, EVM compatible blockchain event listener service that actively scrapes `FeesCollected` events from LI.FI `FeeCollector` contract. For more details see [Challenge Specification](https://lifi.notion.site/Take-home-Assignment-Working-with-Events-4cfdeb285466412a90fbfa2f9aa14784).
 
-An instance of the LimitedMintNFT.sol is deployed on Mumbai Testnet and verified on PolygonScan and can be found [here](https://mumbai.polygonscan.com/address/0x2E9da9425Df470D1640b6E408F16d15425d213C2#code)
+It was a fun and pleasureable challenge!
 
 To run the project:
 1. Install node modules
 ```sh
 npm run install
 ```
-2. Verify postinstall script was executed during (1). If not, execute
-```sh
-npm run postintall
-```
-3. Run unit tests. Requires a local network running @ 127.0.0.1:8545.
-```sh
-npm run test
-```
-To run a local test network, you can use ganache-cli that comes installed with this project.
-```sh
-npx ganache-cli
-```
-4. Deploy to Mumbai Testnet. Variables in .env file must be defined to run this command
-```sh
-npm run migrate:mumbai
-```
-
-5. Verify source code in PolygonScan
-```sh
-npm run verify:mumbai
-```
 
 ## Implementation Notes
 
-The implementation choices of the contract function `LimitedMintNFT.limitedMint(address)` relate to the interpretation of the challenge criteria _Ensure that each address can mint up to 5 NFTs._ 
+The repo contains a generic implementation of an EVM compatible, statefull event listener that can be found at `src/ContractEventListener.ts`. The listener implements a basic backoff strategy with limited retry attempts for handling errors related to provider timeouts, *too many events* errors and *oversized block query space* errors.
 
-The contract enforces a mint limit for any valid address, including EOA and Smart Contract Account addresses. To support this, the contract consideres the function caller to be the _minter_. 
+The listener will start to scrape the selected blockchain network (`.env:BLOCKCHAIN`) between **[*latest_block - MAX_BLOCK_DIFF*, *latest_block*]** where **MAX_BLOCK_DIFF** is set to 2000 blocks (see `src/ContractEventListener.MAX_BLOCK_DIFF`). The listener can be started and stopped at will, and its expected to resume operations from it left off. 
 
-However, to avoid allowing _minters_ to bypass the mint limit by calling the `limitedMint` function from other smart contracts (effectively turning the _minter_ into the caller contract itself), the function also checks if the transaction originator address has reached its mint limit. This check is only done in case the orliginator and the function caller are different addresses.
+Scrapping happens every `src/ContractEventListener.SCRAPE_INTERVAL` milliseconds. Feel free to reduce this interval for testinf purposes (recommended 10seconds);
+
+Alter the `EventListenerState.state.lastFetchedBlock` in the database to determine the staring block from which the listener will start scrapping the blockchain for events.
+
+### API Endpoint
+The service implements a paginated endpoint to retrieve scrapped `FeesCollected` events. The endpoint's implementation along with its interface can be found at `src/router.ts`.
+
+The endpoint can be accessed at `http://<host>:<PORT>/events/fees-collected/:integrator` where `integrator` is the checksummed address of the desired integrator. The paginated parameters are optional and default to the 10 oldest events stored in the database. 
+
+Example endpoint call: `http://localhost:3000/events/fees-collected/0x1aC3EF0ECF4E0ed23D62cab448f3169064230624?offset=0&limit=10`
+
+### Possible areas of improvement
+- Enable historical event scrapping in the codebase (the listener has this functionality enalbed and working, but it must be managed by directly updating its state on the database);
+- Endpoint interface type and schema validators, caching and authentication;
+- Redundant mechanisms to ensure strong data consistency, with focus on avoiding duplicate events in the database;
+- Improvements on `src/technical/provider` module including fallback provider and support for multiple concurrent providers;
+- Support for multiple `ContractEventListener` instances;
+- Handle blockchain reorgs with strong data consistency (ex. discard events from the database that no longer appear in the canonical blockchain path);

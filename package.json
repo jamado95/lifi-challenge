@@ -9,6 +9,7 @@
     "@typegoose/typegoose": "^12.2.0",
     "dotenv": "^16.3.1",
     "ethers": "^6.11.1",
+    "fastify": "^4.26.2",
     "mongoose": "^8.2.1",
     "ts-node": "^10.9.1",
     "typechain": "^8.3.2",
@@ -23,6 +24,7 @@
   },
   "imports": {
     "#types": "./src/types.ts",
+    "#router": "./src/router.ts",
     "#contracts": "./src/contracts/index.ts",
     "#models": "./src/models/index.ts",
     "#technical/*": "./src/technical/*.ts"

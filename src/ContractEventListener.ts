@@ -9,7 +9,7 @@ import { ILogger } from '#technical/logger';
 export class ContractEventListener<E extends CommonTypes.TypedContractEvent> {
 
   static SCRAPE_INTERVAL = 30_000;
-  static MAX_BLOCK_DIFF = 4_000;
+  static MAX_BLOCK_DIFF = 2_000;
   static BACKOFF_RATIO = 2;
   static MAX_RETRY_ATTEMPTS = 3;
 
@@ -87,7 +87,7 @@ export class ContractEventListener<E extends CommonTypes.TypedContractEvent> {
   }
 
   private async fetchEvents(fromBlock: number, toBlock: number, retries = ContractEventListener.MAX_RETRY_ATTEMPTS) {
-    this.logger.debug(`[ContractEventListener] Fetching events for range [${fromBlock}, ${toBlock}] with ${retries} retries left ${this.CurrentMaxBlockDiff}`);
+    this.logger.debug(`[ContractEventListener] Fetching events for range [${fromBlock}, ${toBlock}] with ${retries} retries left`);
     try {
       const contractEvent = this.contract.getEvent(this.eventName);
 

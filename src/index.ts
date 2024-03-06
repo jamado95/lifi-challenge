@@ -1,10 +1,10 @@
 import * as mongoose from 'mongoose';
 
 import { FeeCollectorContract, FeeCollectorTypes, Common as CommonTypes } from "#contracts";
+import { FeesCollectedEventModel } from '#models';
 import { ActiveBlockchain } from '#technical/provider';
 import { MockLogger } from '#technical/logger';
-
-import { FeesCollectedEventModel } from '#models';
+import { app } from '#router';
 
 import { ContractEventListener } from'./ContractEventListener';
 
@@ -12,6 +12,11 @@ import { ContractEventListener } from'./ContractEventListener';
 const MONGODB_URL = process.env.MONGODB_URL;
 if(!MONGODB_URL) {
   throw Error('Missing MONGODB_URL config');
+}
+
+const PORT = Number(process.env.PORT);
+if(!PORT) {
+  throw Error('Missing PORT config');
 }
 
 const FEE_COLLECTOR_ADDRESS = process.env[`${ActiveBlockchain}_FEE_COLLECTOR_CONTRACT`];
@@ -44,7 +49,10 @@ const listener = new ContractEventListener<FeeCollectorTypes.FeesCollectedEvent.
 
 (async function init() {
   await mongoose.connect(MONGODB_URL);
-  MockLogger.debug(`Successfully connected to database at ${MONGODB_URL}\n`);
+  MockLogger.debug(`Successfully connected to database at ${MONGODB_URL}`);
+  
+  const address = await app.listen({ port: PORT });
+  MockLogger.debug(`Server running at ${address}\n`);
 
   // Setup and start listener
   listener.registerEventsProcessor(feesCollectedEventsProcessor);
@@ -60,20 +68,3 @@ async function shutdown() {
 
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
-
-/**
- * TODO
- * 
- * Create API endpoint
- * Create Dockerfile
- * 
- * !!!! Error Handling !!!!
- * !!!! Handle blockchain regorgs (errors where end_block_number < begin_block_number):
- *  - Remove all events stored to DB since begin_block_number and reset listener state to begin_block_number
- * 
- * Fetch Historic events functionality
- * 
- * Cleanup codebase: types, functions, imports
- * Refactor repo structure (if needed)
- * 
- */

@@ -25,7 +25,7 @@ class EventBlock extends Event {
   public blockHash!: string;
 }
 
-class FeesCollectedEvent extends EventBlock {
+export class FeesCollectedEvent extends EventBlock {
   @prop({ required: true, type: String })
   public token!: Blockchain;
 
