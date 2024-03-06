@@ -29,7 +29,7 @@ BLOCKCHAIN=POLYGON
 POLYGON_PROVIDER_URL=https://polygon-rpc.com
 POLYGON_FEE_COLLECTOR_CONTRACT=0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9
 ```
-5. Run project. Currently, project is only enabled to run with **ts-node** due to time constraints.
+5. Run project with **ts-node**.
 ```sh
 npm run dev
 ```
@@ -54,7 +54,6 @@ The endpoint can be accessed at `http://<host>:<PORT>/events/fees-collected/:int
 Example endpoint call: `http://localhost:3000/events/fees-collected/0x1aC3EF0ECF4E0ed23D62cab448f3169064230624?offset=0&limit=10`
 
 ### Possible areas of improvement
-- Enable project to run from `dist` project with `node`;
 - Add unit testing to endpoint and listener features;
 - Enable historical event scrapping in the codebase (the listener has this functionality enalbed and working, but it must be managed by directly updating its state on the database);
 - Endpoint interface type and schema validators, caching and authentication;
