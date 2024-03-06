@@ -1,0 +1,30 @@
+{
+  "scripts": {
+    "generate-typechain": "typechain --target ethers-v6 --out-dir ./src/contracts/typechain ./src/contracts/abi/*.json",
+    "start": "node ./dist/index.js",
+    "dev": "ts-node -r ./dotenv.config.ts ./src/index.ts",
+    "build": "tsc --skipLibCheck && tsc-alias"
+  },
+  "dependencies": {
+    "@typegoose/typegoose": "^12.2.0",
+    "dotenv": "^16.3.1",
+    "ethers": "^6.11.1",
+    "mongoose": "^8.2.1",
+    "ts-node": "^10.9.1",
+    "typechain": "^8.3.2",
+    "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@typechain/ethers-v6": "^0.5.1",
+    "@types/chai": "^4.3.10",
+    "@types/mocha": "^10.0.4",
+    "@types/node": "^20.9.0",
+    "tsc-alias": "^1.8.8"
+  },
+  "imports": {
+    "#types": "./src/types.ts",
+    "#contracts": "./src/contracts/index.ts",
+    "#models": "./src/models/index.ts",
+    "#technical/*": "./src/technical/*.ts"
+  }
+}
