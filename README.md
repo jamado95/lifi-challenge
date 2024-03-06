@@ -2,13 +2,39 @@
 
 Generic, EVM compatible blockchain event listener service that actively scrapes `FeesCollected` events from LI.FI `FeeCollector` contract. For more details see [Challenge Specification](https://lifi.notion.site/Take-home-Assignment-Working-with-Events-4cfdeb285466412a90fbfa2f9aa14784).
 
-It was a fun and pleasureable challenge!
+It was a fun challenge!
 
 To run the project:
-1. Install node modules
+1. Clone repo to local
 ```sh
-npm run install
+git clone https://github.com/jamado95/lifi-challenge.git
 ```
+2. Install node modules (node v18.18.2, all packages use latest version)
+```sh
+npm ci
+```
+3. Build project
+```sh
+npm run build
+```
+4. Setup local **MONGODB_URL, PORT, POLYGON_PROVIDER_URL and POLYGON_FEE_COLLECTOR_CONTRACT** configurations in `.env` file. See working example bellow.
+```sh
+# Remove flag to disable debug logs. Recommend keep enabled for better visibility
+DEBUG=true
+
+PORT=3000
+MONGODB_URL=mongodb://localhost:27017/test
+
+BLOCKCHAIN=POLYGON
+POLYGON_PROVIDER_URL=https://polygon-rpc.com
+POLYGON_FEE_COLLECTOR_CONTRACT=0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9
+```
+5. Run project. Currently, project is only enabled to run with **ts-node** due to time constraints.
+```sh
+npm run dev
+```
+
+The project has been tested locally and should be working as expected and described in the challenge according to my best interpretation of the specs. Feel welcome to reach out with any questions, or issues while trying to run the project!
 
 ## Implementation Notes
 
@@ -23,11 +49,13 @@ Alter the `EventListenerState.state.lastFetchedBlock` in the database to determi
 ### API Endpoint
 The service implements a paginated endpoint to retrieve scrapped `FeesCollected` events. The endpoint's implementation along with its interface can be found at `src/router.ts`.
 
-The endpoint can be accessed at `http://<host>:<PORT>/events/fees-collected/:integrator` where `integrator` is the checksummed address of the desired integrator. The paginated parameters are optional and default to the 10 oldest events stored in the database. 
+The endpoint can be accessed at `http://<host>:<PORT>/events/fees-collected/:integrator?offset=0&limit=10` where `integrator` is the checksummed address of the desired integrator, and `PORT` is defined at `.env` file. The paginated parameters are optional and default to the 10 oldest events stored in the database. 
 
 Example endpoint call: `http://localhost:3000/events/fees-collected/0x1aC3EF0ECF4E0ed23D62cab448f3169064230624?offset=0&limit=10`
 
 ### Possible areas of improvement
+- Enable project to run from `dist` project with `node`;
+- Add unit testing to endpoint and listener features;
 - Enable historical event scrapping in the codebase (the listener has this functionality enalbed and working, but it must be managed by directly updating its state on the database);
 - Endpoint interface type and schema validators, caching and authentication;
 - Redundant mechanisms to ensure strong data consistency, with focus on avoiding duplicate events in the database;
