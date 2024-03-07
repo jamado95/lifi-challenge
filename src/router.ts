@@ -19,13 +19,12 @@ app.get<IGetFeesCollectedEvents>('/events/fees-collected/:integrator', async (re
   const { integrator } = request.params;
   const { offset = 0, limit = 10 } = request.query;
 
-  const data =
-    await FeesCollectedEventModel.find({ integrator })
-      .select('-_id -__v')
-      .sort({ blockNumber: 1 })
-      .skip(offset)
-      .limit(limit)
-      .exec();
+  const data = await FeesCollectedEventModel.find({ integrator })
+    .select('-_id -__v')
+    .sort({ blockNumber: 1 })
+    .skip(offset)
+    .limit(limit)
+    .exec();
 
   if(!data.length) {
     return reply.code(404).send();

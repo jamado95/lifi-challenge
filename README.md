@@ -42,7 +42,7 @@ The project has been tested locally and should be working as expected and descri
 
 ## Implementation Notes
 
-The repo contains a generic implementation of an EVM compatible, statefull event listener that can be found at `src/ContractEventListener.ts`. The listener implements a basic backoff strategy with limited retry attempts for handling errors related to provider timeouts, *too many events* errors and *oversized block query space* errors.
+The repo contains a generic implementation of an EVM compatible, statefull event listener that can be found at `src/ContractEventListener.ts`. The listener and its state manager are designed in such a way as to allow for multiple listener instances to run concurrently, with each instance scrapping data for an unique combination of blockchain network, contract address and event types. The listener implements a basic backoff strategy with limited retry attempts for handling errors related to provider timeouts, *too many events* errors and *oversized block query space* errors. 
 
 The listener will start to scrape the selected blockchain network (`.env:BLOCKCHAIN`) between **[*latest_block - MAX_BLOCK_DIFF*, *latest_block*]** where **MAX_BLOCK_DIFF** is set to 2000 blocks (see `src/ContractEventListener.MAX_BLOCK_DIFF`). The listener can be started and stopped at will, and its expected to resume operations from it left off. 
 
@@ -58,10 +58,9 @@ The endpoint can be accessed at `http://<host>:<PORT>/events/fees-collected/:int
 Example endpoint call: `http://localhost:3000/events/fees-collected/0x1aC3EF0ECF4E0ed23D62cab448f3169064230624?offset=0&limit=10`
 
 ### Possible areas of improvement
-- Add unit testing to API endpoint;
+- Add unit testing to API endpoint; Extend unit test coverage of listener functionality;
 - Enable historical event scrapping in the codebase (the listener has this functionality enalbed and working, but it must be managed by directly updating its state on the database);
 - Endpoint interface type and schema validators, caching and authentication;
 - Redundant mechanisms to ensure strong data consistency, with focus on avoiding duplicate events in the database;
 - Improvements on `src/technical/provider` module including fallback provider and support for multiple concurrent providers;
-- Support for multiple `ContractEventListener` instances;
 - Handle blockchain reorgs with strong data consistency (ex. discard events from the database that no longer appear in the canonical blockchain path);
