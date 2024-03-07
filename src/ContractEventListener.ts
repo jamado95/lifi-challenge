@@ -13,7 +13,7 @@ export class ContractEventListener<E extends CommonTypes.TypedContractEvent> {
   static BACKOFF_RATIO = 2;
   static MAX_RETRY_ATTEMPTS = 3;
 
-  private CurrentMaxBlockDiff: number = ContractEventListener.MAX_BLOCK_DIFF;
+  public CurrentMaxBlockDiff: number = ContractEventListener.MAX_BLOCK_DIFF;
 
   private readonly eventName: E['name'];
   private readonly contract: BaseContract;
@@ -47,7 +47,7 @@ export class ContractEventListener<E extends CommonTypes.TypedContractEvent> {
     this.eventsProcessor = processor;
   }
 
-  async start(fromBlockOverride?: number) {
+  async start() {
     this.running = true;
 
     // Iniate scrapping / live listener loop
@@ -56,7 +56,7 @@ export class ContractEventListener<E extends CommonTypes.TypedContractEvent> {
       const startTimeMs = Date.now();
       const state = await this.state.load();
       const toBlock = await Provider.getBlockNumber();
-      const fromBlock = fromBlockOverride ?? state?.lastFetchedBlock ?? toBlock - this.CurrentMaxBlockDiff;
+      const fromBlock = state?.lastFetchedBlock ?? toBlock - this.CurrentMaxBlockDiff;
       
       try {
         await this.fetchEvents(fromBlock, toBlock);

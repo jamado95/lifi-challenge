@@ -7,9 +7,10 @@ export interface ILogger {
 }
 
 const DEBUG = process.env.DEBUG;
+const NO_LOGS = process.env.NO_LOGS;
 export const MockLogger: ILogger = {
-  debug(...args: unknown[]) { DEBUG && console.log('[DEBUG]', ...args) },
-  warn(...args: unknown[]) { console.log('[WARN]', ...args) },
-  error(...args: unknown[]) { console.log('[ERROR]', ...args) },
-  critical(...args: unknown[]) { console.log('[CRITICAL]', ...args) },
+  debug(...args: unknown[]) { !NO_LOGS && DEBUG && console.log('[DEBUG]', ...args) },
+  warn(...args: unknown[]) { !NO_LOGS && console.log('[WARN]', ...args) },
+  error(...args: unknown[]) { !NO_LOGS && console.log('[ERROR]', ...args) },
+  critical(...args: unknown[]) { !NO_LOGS && console.log('[CRITICAL]', ...args) },
 }

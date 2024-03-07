@@ -13,7 +13,7 @@ git clone https://github.com/jamado95/lifi-challenge.git
 ```sh
 npm ci
 ```
-3. Build project
+3. Build project (optional)
 ```sh
 npm run build
 ```
@@ -29,7 +29,11 @@ BLOCKCHAIN=POLYGON
 POLYGON_PROVIDER_URL=https://polygon-rpc.com
 POLYGON_FEE_COLLECTOR_CONTRACT=0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9
 ```
-5. Run project with **ts-node**.
+5. Run unit tests ⚠️ Ensure you're using a clean/empty dedicated testing database.
+```sh
+npm run test
+```
+6. Run project with **ts-node**.
 ```sh
 npm run dev
 ```
@@ -54,7 +58,7 @@ The endpoint can be accessed at `http://<host>:<PORT>/events/fees-collected/:int
 Example endpoint call: `http://localhost:3000/events/fees-collected/0x1aC3EF0ECF4E0ed23D62cab448f3169064230624?offset=0&limit=10`
 
 ### Possible areas of improvement
-- Add unit testing to endpoint and listener features;
+- Add unit testing to API endpoint;
 - Enable historical event scrapping in the codebase (the listener has this functionality enalbed and working, but it must be managed by directly updating its state on the database);
 - Endpoint interface type and schema validators, caching and authentication;
 - Redundant mechanisms to ensure strong data consistency, with focus on avoiding duplicate events in the database;
